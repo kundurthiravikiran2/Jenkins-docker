@@ -1,0 +1,35 @@
+pipeline{
+    agent any
+    tools{
+        maven 'maven3'
+    }
+    stages{
+        stage('checkout-code'){
+            steps{
+                git 'https://github.com/kundurthiravikiran2/maven-web-app.git'
+            }
+        }
+        stage('compile-project'){
+            steps{
+                sh 'mvn compile'
+            }
+        }
+        stage('package-code'){
+            steps{
+                sh 'mvn clean package'
+            }
+        }
+        stage('build-image'){
+            steps{
+                sh 'docker build -t mywebsite .'
+            }
+        }
+        stage('deployment-process'){
+            steps{
+                sh 'docker stop webapp'
+                sh 'docker rm webapp'
+                sh 'docker run -itd --name webapp -p 9090:8080 mywebsite'
+            }
+        }
+    }
+}
